@@ -1,12 +1,16 @@
 package com.codepath.apps.restclienttemplate;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
@@ -52,8 +56,41 @@ public class TimelineActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        //inflate the menu; this adds items to the action bar if it is present
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        //return true for menu to be displayed (see doc of overriden method)
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    {
+        // if id of menu item clicked == ?
+        switch (item.getItemId())
+        {
+            // logout item clicked
+            case R.id.logout:
+                // notify user logout has been clicked
+                Toast.makeText(this, "logout", Toast.LENGTH_SHORT).show();
+                Log.d("TimelineActivity", "logout button clicked");
+
+                // forget who's logged in
+                TwitterApp.getRestClient(this).clearAccessToken();
+
+                // navigate backwards to Login screen
+                //== OPTION 1 ==//
+                Intent i = new Intent(this, LoginActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // this makes sure the Back button won't work; close activities (TimelineActivity) on top of existing LoginActivity | ref: https://riptutorial.com/android/example/2736/clearing-an-activity-stack
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // clear ALL activites on top of existing LoginActivity
+                startActivity(i);
+
+//                //== OPTION 2 ==//
+//                finish();
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void populateHomeTimeline()
