@@ -70,26 +70,24 @@ public class TimelineActivity extends AppCompatActivity
         {
             // logout item clicked
             case R.id.logout:
-                // notify user logout has been clicked
-                Toast.makeText(this, "logout", Toast.LENGTH_SHORT).show();
-                Log.d("TimelineActivity", "logout button clicked");
-
                 // forget who's logged in
                 TwitterApp.getRestClient(this).clearAccessToken();
 
-                // navigate backwards to Login screen
+                // navigate backwards to login activity
                 //== OPTION 1 ==//
-                Intent i = new Intent(this, LoginActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // this makes sure the Back button won't work; close activities (TimelineActivity) on top of existing LoginActivity | ref: https://riptutorial.com/android/example/2736/clearing-an-activity-stack
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // clear ALL activites on top of existing LoginActivity
-                startActivity(i);
+                Intent i_logout = new Intent(this, LoginActivity.class); // params: origin, destination
+                i_logout.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // this makes sure the Back button won't work; close activities (TimelineActivity) on top of existing LoginActivity | ref: https://riptutorial.com/android/example/2736/clearing-an-activity-stack
+                i_logout.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // clear ALL activites on top of existing LoginActivity
+                startActivity(i_logout);
 
 //                //== OPTION 2 ==//
 //                finish();
                 // return true to "consume" here (see docs) qq: what is consume?
                 return true;
             case R.id.compose:
-                Toast.makeText(this, "compose", Toast.LENGTH_SHORT).show();
+                // navigate to compose activity
+                Intent i_compose = new Intent(this, ComposeActivity.class);
+                startActivity(i_compose);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

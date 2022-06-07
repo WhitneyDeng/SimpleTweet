@@ -9,6 +9,8 @@ import java.util.List;
 
 public class Tweet
 {
+    public final static int MAX_BODY_LENGTH = 140;
+
     public String body;
     public String createdAt;
     public User user;
