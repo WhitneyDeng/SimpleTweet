@@ -42,17 +42,34 @@ public class TwitterClient extends OAuthBaseClient {
 				String.format(REST_CALLBACK_URL_TEMPLATE, context.getString(R.string.intent_host),
 						context.getString(R.string.intent_scheme), context.getPackageName(), FALLBACK_URL));
 	}
-	// CHANGE THIS
+
 	// DEFINE METHODS for different API endpoints here
 	// API ref: https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-home_timeline
 	public void getHomeTimeline(JsonHttpResponseHandler handler)
 	{
+		// GET ""
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
-		// Can specify query string params directly or through RequestParams.
+
+		// Can specify query string params directly or through RequestParams. (HTTPS request headers)
 		RequestParams params = new RequestParams();
 		params.put("count", 25);
 		params.put("since_id", 1);
-		client.get(apiUrl, params, handler); // client: protected field var from OAuthBaseClient
+
+		// get: HTTPS operation
+		client.get(apiUrl, params, handler); // client: protected field var from OAuthBaseClient | handler: postman (handles HTTPS response on success/failure)
+	}
+
+	// API ref: https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
+	// similar structure to getHomeTimeline()
+	public void publishTweet(String tweetContent, JsonHttpResponseHandler handler)
+	{
+		String apiUrl = getApiUrl("statuses/update.json");
+
+		RequestParams params = new RequestParams();
+		params.put("status", tweetContent);
+
+		// post: HTTPS operation
+		client.post(apiUrl, params, "", handler);
 	}
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint
