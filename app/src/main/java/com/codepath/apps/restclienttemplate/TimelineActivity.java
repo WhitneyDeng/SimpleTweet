@@ -86,7 +86,10 @@ public class TimelineActivity extends AppCompatActivity
 
 //                //== OPTION 2 ==//
 //                finish();
-
+                // return true to "consume" here (see docs) qq: what is consume?
+                return true;
+            case R.id.compose:
+                Toast.makeText(this, "compose", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -54,11 +54,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         return tweets.size();
     }
 
-
-
-
-
-
     // define viewholder (view holder for itemview <=> activity for view)
     public class ViewHolder extends RecyclerView.ViewHolder
     {
