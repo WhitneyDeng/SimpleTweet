@@ -44,12 +44,14 @@ public class TwitterClient extends OAuthBaseClient {
 	}
 	// CHANGE THIS
 	// DEFINE METHODS for different API endpoints here
+	// API ref: https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-home_timeline
 	public void getHomeTimeline(JsonHttpResponseHandler handler)
 	{
-		String apiUrl = getApiUrl("?nojsoncallback=1&method=flickr.interestingness.getList");
+		String apiUrl = getApiUrl("/statuses/home_timeline.json");
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
-		params.put("format", "json");
+//		params.put("count", 25);
+//		params.put("since_id", 1);
 		client.get(apiUrl, params, handler);
 	}
 

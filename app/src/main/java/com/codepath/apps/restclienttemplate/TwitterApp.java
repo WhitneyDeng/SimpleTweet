@@ -33,6 +33,7 @@ public class TwitterApp extends Application {
     }
 
     public static TwitterClient getRestClient(Context context) {
+        // getInstance() explained: https://www.quora.com/What-is-the-difference-between-new-getInstance-and-newInstance-in-java
         return (TwitterClient) TwitterClient.getInstance(TwitterClient.class, context);
     }
 
