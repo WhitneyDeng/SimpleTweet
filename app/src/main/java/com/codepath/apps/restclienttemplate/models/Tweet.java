@@ -3,10 +3,12 @@ package com.codepath.apps.restclienttemplate.models;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Parcel //to pass composed tweet back to timeline
 public class Tweet
 {
     public final static int MAX_BODY_LENGTH = 140;
@@ -14,6 +16,10 @@ public class Tweet
     public String body;
     public String createdAt;
     public User user;
+
+    // FOR: Parceler library
+    public Tweet() {
+    }
 
     // populate Tweet object from json response
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException

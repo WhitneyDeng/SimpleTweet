@@ -1,12 +1,19 @@
 package com.codepath.apps.restclienttemplate;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +33,8 @@ import okhttp3.Headers;
 public class TimelineActivity extends AppCompatActivity
 {
     public static final String TAG = "TimelineActivity"; // for Log
+    public final int REQUEST_CODE = 20; // startActivityForResult(): to determine result type later
+
     TwitterClient client;
     RecyclerView rvTweets;
     List<Tweet> tweets;
@@ -87,12 +96,50 @@ public class TimelineActivity extends AppCompatActivity
             case R.id.compose:
                 // navigate to compose activity
                 Intent i_compose = new Intent(this, ComposeActivity.class);
-                startActivity(i_compose);
+                startActivityForResult(i_compose, REQUEST_CODE);
+//                launcher.launch(i_compose); // ALT: new way of doing startAcitivtyForResult()
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    // request code == REQUEST_CODE; resultCode = if child activity finished successfully
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK)
+        {
+            // get data from intent (tweet)
+            Tweet newTweet = data.getParcelableExtra(data.getParcelableExtra("tweet"));
+
+            // update rv with newly composed tweet
+            // modify data source of tweets
+            tweets.add(0, newTweet);
+            // update rv adapter
+            adapter.notifyItemInserted(0);
+            rvTweets.smoothScrollToPosition(0); // so no need scroll up to see new tweet
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    //    // ALT: new way of doing startActivityForResult()
+//    // src: https://stackoverflow.com/questions/62671106/onactivityresult-method-is-deprecated-what-is-the-alternative
+//    ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+//            new ActivityResultContracts.StartActivityForResult(),
+//            new ActivityResultCallback<ActivityResult>()
+//            {
+//                @Override
+//                public void onActivityResult(ActivityResult result)
+//                {
+//                    if (result.getResultCode() == Activity.RESULT_OK)
+//                    {
+//                        Intent data = result.getData();
+//                        // do sth with result
+//                    }
+//                }
+//            }
+//    );
 
     private void populateHomeTimeline()
     {
