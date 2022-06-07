@@ -47,12 +47,12 @@ public class TwitterClient extends OAuthBaseClient {
 	// API ref: https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-home_timeline
 	public void getHomeTimeline(JsonHttpResponseHandler handler)
 	{
-		String apiUrl = getApiUrl("/statuses/home_timeline.json");
+		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
-//		params.put("count", 25);
-//		params.put("since_id", 1);
-		client.get(apiUrl, params, handler);
+		params.put("count", 25);
+		params.put("since_id", 1);
+		client.get(apiUrl, params, handler); // client: protected field var from OAuthBaseClient
 	}
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint
