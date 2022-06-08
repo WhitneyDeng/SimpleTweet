@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="5dp">
 
+<!--    Round profile photo src: https://stackoverflow.com/questions/22105775/imageview-in-circular-through-xml-->
     <androidx.cardview.widget.CardView
 
         android:id="@+id/cvProfileImage"
@@ -26,6 +27,8 @@
             tools:srcCompat="@tools:sample/avatars" />
 
     </androidx.cardview.widget.CardView>
+
+<!--    Text colour scheme: https://usbrandcolors.com/twitter-colors/-->
 
     <TextView
         android:id="@+id/tvScreenName"

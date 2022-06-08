@@ -78,7 +78,9 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     {
         ImageView ivProfileImage;
         TextView tvBody;
+        TextView tvName;
         TextView tvScreenName;
+        TextView tvRelativeTimestamp;
         ImageView ivPostImage;
 
         // itemView: representation of one row in recycler view
@@ -87,14 +89,19 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             super(itemView);
             ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
             tvBody = itemView.findViewById(R.id.tvBody);
+            tvName = itemView.findViewById(R.id.tvName);
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
+            tvRelativeTimestamp = itemView.findViewById(R.id.tvRelativeTimestamp);
             ivPostImage = itemView.findViewById(R.id.ivPostImage);
         }
 
         public void bind(Tweet tweet)
         {
             tvBody.setText(tweet.body);
-            tvScreenName.setText(tweet.user.screenName);
+            tvName.setText(tweet.user.name);
+            tvScreenName.setText("@" + tweet.user.screenName);
+            tvRelativeTimestamp.setText(getRelativeTimeAgo(tweet.createdAt));
+
             Glide.with(context)
                     .load(tweet.user.profileImageUrl)
                     .into(ivProfileImage);
@@ -112,7 +119,6 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                         .transform(new RoundedCorners(radius))
                         .into(ivPostImage);
             }
-            //todo: calculate most recent time
         }
 
         // getRelativeTimeAgo("Mon Apr 01 21:16:23 +0000 2014");

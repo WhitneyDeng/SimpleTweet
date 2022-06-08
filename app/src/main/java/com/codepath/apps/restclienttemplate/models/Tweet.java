@@ -44,7 +44,6 @@ public class Tweet
         {
             tweet.mediaUrlHttps = NO_MEDIA;
         }
-
         return tweet;
     }
 
