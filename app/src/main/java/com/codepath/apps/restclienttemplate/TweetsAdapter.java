@@ -2,6 +2,7 @@ package com.codepath.apps.restclienttemplate;
 
 import android.content.Context;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     Context context;
     List<Tweet> tweets;
 
+    public static final String TAG = "TweetsAdapter";
     // pass in context and list of tweets
     public TweetsAdapter(Context context, List<Tweet> tweets)
     {
@@ -115,8 +117,8 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
                 int radius = 30;
                 Glide.with(context)
                         .load(tweet.mediaUrlHttps)
-                        .centerCrop()
-                        .transform(new RoundedCorners(radius))
+                        .centerCrop()                           // to round corners (note: must enable adjustViewBounds in xml)
+                        .transform(new RoundedCorners(radius))  // to round corners
                         .into(ivPostImage);
             }
         }
@@ -125,18 +127,34 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         public String getRelativeTimeAgo(String rawJsonDate) {
             String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
             SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
-            sf.setLenient(true);
+            sf.setLenient(true); //what is leniency?: https://stackoverflow.com/questions/7606387/what-is-the-use-of-lenient
 
-            String relativeDate = "";
             try {
-                long dateMillis = sf.parse(rawJsonDate).getTime();
-                relativeDate = DateUtils.getRelativeTimeSpanString(dateMillis,
-                        System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+                long time = sf.parse(rawJsonDate).getTime();
+                long now = System.currentTimeMillis();
+
+                final long diff = now - time;
+                if (diff < DateUtils.MINUTE_IN_MILLIS) {
+                    return "just now";
+                } else if (diff < 2 * DateUtils.MINUTE_IN_MILLIS) {
+                    return "a minute ago";
+                } else if (diff < 50 * DateUtils.MINUTE_IN_MILLIS) {
+                    return diff / DateUtils.MINUTE_IN_MILLIS + " m";
+                } else if (diff < 90 * DateUtils.MINUTE_IN_MILLIS) {
+                    return "an hour ago";
+                } else if (diff < 24 * DateUtils.HOUR_IN_MILLIS) {
+                    return diff / DateUtils.HOUR_IN_MILLIS + " h";
+                } else if (diff < 48 * DateUtils.HOUR_IN_MILLIS) {
+                    return "yesterday";
+                } else {
+                    return diff / DateUtils.DAY_IN_MILLIS + " d";
+                }
+                // todo: if over a month ago, put date & month only
             } catch (ParseException e) {
+                Log.i(TAG, "getRelativeTimeAgo failed");
                 e.printStackTrace();
             }
-
-            return relativeDate;
+            return "";
         }
     }
 }
