@@ -12,10 +12,13 @@ import java.util.List;
 public class Tweet
 {
     public final static int MAX_BODY_LENGTH = 140;
+    public final static int FIRST_ITEM = 0;
+    public final static String NO_MEDIA = "no media in this post";
 
     public String body;
     public String createdAt;
     public User user;
+    public String mediaUrlHttps;
 
     // FOR: Parceler library
     public Tweet() {
@@ -28,6 +31,19 @@ public class Tweet
         tweet.body = jsonObject.getString("text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user")); //make a User object based on json Object
+
+        JSONObject entities = jsonObject.getJSONObject("entities");
+        if (entities.has("media"))
+        {
+            tweet.mediaUrlHttps = entities
+                    .getJSONArray("media")
+                    .getJSONObject(FIRST_ITEM) // first position
+                    .getString("media_url_https");
+        }
+        else
+        {
+            tweet.mediaUrlHttps = NO_MEDIA;
+        }
         return tweet;
     }
 

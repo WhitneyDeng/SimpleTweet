@@ -74,6 +74,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         ImageView ivProfileImage;
         TextView tvBody;
         TextView tvScreenName;
+        ImageView ivPostImage;
 
         // itemView: representation of one row in recycler view
         public ViewHolder(@NonNull View itemView)
@@ -82,6 +83,7 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             ivProfileImage = itemView.findViewById(R.id.ivProfileImage);
             tvBody = itemView.findViewById(R.id.tvBody);
             tvScreenName = itemView.findViewById(R.id.tvScreenName);
+            ivPostImage = itemView.findViewById(R.id.ivPostImage);
         }
 
         public void bind(Tweet tweet)
@@ -91,6 +93,17 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
             Glide.with(context)
                     .load(tweet.user.profileImageUrl)
                     .into(ivProfileImage);
+
+            if (tweet.mediaUrlHttps.equals(Tweet.NO_MEDIA))
+            {
+                ivPostImage.setVisibility(View.GONE);
+            }
+            else
+            {
+                Glide.with(context)
+                        .load(tweet.mediaUrlHttps)
+                        .into(ivPostImage);
+            }
         }
     }
 }
