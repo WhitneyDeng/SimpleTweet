@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -39,6 +40,7 @@ public class TimelineActivity extends AppCompatActivity
     RecyclerView rvTweets;
     List<Tweet> tweets;
     TweetsAdapter adapter;
+    SwipeRefreshLayout swipeContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -48,6 +50,7 @@ public class TimelineActivity extends AppCompatActivity
 
         client = TwitterApp.getRestClient(this);
 
+        //SETUP: recycler view
         // find recycler view
         rvTweets = findViewById(R.id.rvTweets);
 
@@ -60,6 +63,86 @@ public class TimelineActivity extends AppCompatActivity
         rvTweets.setAdapter(adapter); //set adapter for rv
 
         populateHomeTimeline();
+
+        //SETUP: swipe to refresh
+        // find swipe container view
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        // set up refresh listener to trigger new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
+        {
+            // actions when refresh
+            @Override
+            public void onRefresh()
+            {
+                // refresh list
+                fetchTimelineAsync(0);
+            }
+        });
+
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+    }
+
+    public void fetchTimelineAsync(int page) {
+        // Send the network request to fetch the updated data
+        // `client` here is an instance of Android Async HTTP
+        // getHomeTimeline is an example endpoint.
+        client.getHomeTimeline(new JsonHttpResponseHandler()
+        {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json)
+            {
+                Log.i(TAG, "onSuccess " + json.toString());
+                JSONArray jsonArray = json.jsonArray;   // get array of tweets
+
+                // Remember to CLEAR OUT old items before appending in the new ones
+                adapter.clear();
+
+                try {
+                    // add new items to your adapter
+                    tweets.addAll(Tweet.fromJsonArray(jsonArray));
+                    // Now we call setRefreshing(false) to signal refresh has finished
+                    swipeContainer.setRefreshing(false);
+//                    adapter.notifyDataSetChanged(); //qq: why is this unnecessary
+                } catch (JSONException e) {
+                    Log.e(TAG, "Json exception", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable)
+            {
+                Log.d("DEBUG", "Fetch timeline error: " + throwable.toString());
+            }
+        });
+    }
+
+    private void populateHomeTimeline()
+    {
+        client.getHomeTimeline(new JsonHttpResponseHandler()
+        {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json)
+            {
+                Log.i(TAG, "onSuccess " + json.toString());
+                JSONArray jsonArray = json.jsonArray;   // get array of tweets
+                try {
+                    tweets.addAll(Tweet.fromJsonArray(jsonArray)); // adapter's 'tweets' points to this.tweets
+                    adapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    Log.e(TAG, "Json exception", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable)
+            {
+                Log.e(TAG, "onFailure " + response, throwable); //error response from server, throwable: print out the exception
+            }
+        });
     }
 
     @Override
@@ -140,29 +223,4 @@ public class TimelineActivity extends AppCompatActivity
 //                }
 //            }
 //    );
-
-    private void populateHomeTimeline()
-    {
-        client.getHomeTimeline(new JsonHttpResponseHandler()
-        {
-            @Override
-            public void onSuccess(int statusCode, Headers headers, JSON json)
-            {
-                Log.i(TAG, "onSuccess " + json.toString());
-                JSONArray jsonArray = json.jsonArray;   // get array of tweets
-                try {
-                    tweets.addAll(Tweet.fromJsonArray(jsonArray));
-                    adapter.notifyDataSetChanged();
-                } catch (JSONException e) {
-                    Log.e(TAG, "Json exception", e);
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable)
-            {
-                Log.e(TAG, "onFailure " + response, throwable); //error response from server, throwable: print out the exception
-            }
-        });
-    }
 }

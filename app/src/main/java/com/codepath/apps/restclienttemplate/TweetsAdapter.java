@@ -54,6 +54,20 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
         return tweets.size();
     }
 
+    //FOR: swipe down to refresh
+    // Clean all elements of the recycler
+    public void clear() {
+        tweets.clear();
+        notifyDataSetChanged();
+    }
+
+    //FOR: swipe down to refresh
+    // Add a list of items -- change to type used
+    public void addAll(List<Tweet> list) {
+        tweets.addAll(list);
+        notifyDataSetChanged();
+    }
+
     // define viewholder (view holder for itemview <=> activity for view)
     public class ViewHolder extends RecyclerView.ViewHolder
     {
