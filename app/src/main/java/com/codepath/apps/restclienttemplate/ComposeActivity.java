@@ -91,7 +91,6 @@ public class ComposeActivity extends AppCompatActivity
                         Log.e(TAG, "onFailure to publish tweet", throwable);
                     }
                 });
-
             }
         });
     }

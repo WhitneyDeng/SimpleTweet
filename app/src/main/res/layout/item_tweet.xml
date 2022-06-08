@@ -6,15 +6,26 @@
     android:layout_height="wrap_content"
     android:layout_margin="5dp">
 
-    <ImageView
-        android:id="@+id/ivProfileImage"
+    <androidx.cardview.widget.CardView
+
+        android:id="@+id/cvProfileImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:layout_gravity="center"
+        app:cardCornerRadius="250dp">
+
+        <ImageView
+            android:id="@+id/ivProfileImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            android:scaleType="centerCrop"
+            tools:srcCompat="@tools:sample/avatars" />
+
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/tvScreenName"
@@ -23,10 +34,37 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="5dp"
         android:layout_marginTop="0dp"
-        android:layout_toEndOf="@+id/ivProfileImage"
+        android:layout_toEndOf="@+id/tvName"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#657786"
         android:textSize="12sp"
         tools:text="dengdengdang" />
+
+    <TextView
+        android:id="@+id/divider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="0dp"
+        android:layout_toEndOf="@+id/tvScreenName"
+        android:text="·"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#657786"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tvRelativeTimestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="0dp"
+        android:layout_toEndOf="@+id/divider"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#657786"
+        android:textSize="12sp"
+        tools:text="2h" />
 
     <TextView
         android:id="@+id/tvBody"
@@ -35,9 +73,10 @@
         android:layout_below="@+id/tvScreenName"
         android:layout_marginStart="5dp"
         android:layout_marginTop="2dp"
-        android:layout_toEndOf="@+id/ivProfileImage"
+        android:layout_toEndOf="@+id/cvProfileImage"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="10sp"
+        android:textColor="#14171A"
+        android:textSize="12sp"
         tools:text="First Tweet!" />
 
     <ImageView
@@ -49,6 +88,19 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd="0dp"
-        android:layout_toEndOf="@+id/ivProfileImage"
+        android:layout_toEndOf="@+id/cvProfileImage"
         tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="0dp"
+        android:layout_toEndOf="@+id/cvProfileImage"
+        android:textColor="#14171A"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        tools:text="Whitney Deng" />
 </RelativeLayout>
