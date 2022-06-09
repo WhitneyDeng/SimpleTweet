@@ -14,13 +14,13 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ComposeActivity"
+            android:name=".activities.ComposeActivity"
             android:exported="false" />
         <activity
-            android:name=".TimelineActivity"
+            android:name=".activities.TimelineActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme">
             <intent-filter>
