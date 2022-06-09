@@ -18,6 +18,7 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AbsListView;
 import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
@@ -56,13 +57,15 @@ public class TimelineActivity extends AppCompatActivity
 
         // init list of tweets & the adapter
         tweets = new ArrayList<>();
-        adapter = new TweetsAdapter(this, tweets);
+        adapter = new TweetsAdapter();
 
         // recycler view setup: layout manager & the adapter
         rvTweets.setLayoutManager(new LinearLayoutManager(this)); //set layout manager
         rvTweets.setAdapter(adapter); //set adapter for rv
 
         populateHomeTimeline();
+
+        rvTweets.addOnScrollListener(new RecyclerView.OnScrollListener() {});
 
         //SETUP: swipe to refresh
         // find swipe container view

@@ -15,6 +15,7 @@ public class Tweet
     public final static int FIRST_ITEM = 0;
     public final static String NO_MEDIA = "no media in this post";
 
+    public int id;
     public String body;
     public String createdAt;
     public User user;
@@ -28,6 +29,7 @@ public class Tweet
     public static Tweet fromJson(JSONObject jsonObject) throws JSONException
     {
         Tweet tweet = new Tweet();
+        tweet.id = jsonObject.getInt("id");
         tweet.body = jsonObject.getString("text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user")); //make a User object based on json Object

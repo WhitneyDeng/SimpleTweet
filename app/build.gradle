@@ -69,4 +69,7 @@ dependencies {
 //    //FOR TextInputLayout
 //    implementation "androidx.appcompat:appcompat:1.4.2"
 //    implementation "com.google.android.material:material:1.6.1"
+    //FOR: Paging & LiveDate
+    implementation "androidx.paging:paging-runtime:3.1.1"
+    implementation "androidx.lifecycle:lifecycle-livedata:2.4.1"
 }

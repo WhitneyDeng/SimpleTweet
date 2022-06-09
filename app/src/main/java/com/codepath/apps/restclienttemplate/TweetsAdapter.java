@@ -10,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.paging.PagedList;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -20,20 +23,39 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 // signature: extends: an adapter for recyclerview that holds tweets (viewholder)
-public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder>
+public class TweetsAdapter extends PagedListAdapter<Tweet, TweetsAdapter.ViewHolder>
 {
     Context context;
     List<Tweet> tweets;
 
     public static final String TAG = "TweetsAdapter";
-    // pass in context and list of tweets
-    public TweetsAdapter(Context context, List<Tweet> tweets)
+
+    public static final DiffUtil.ItemCallback<Tweet> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<Tweet>() {
+                @Override
+                public boolean areItemsTheSame(Tweet oldItem, Tweet newItem) {
+                    return oldItem.id == newItem.id;
+                }
+                @Override
+                public boolean areContentsTheSame(Tweet oldItem, Tweet newItem) {
+                    return (Objects.equals(oldItem, newItem)); //orig: compare each field (but I'm too lazy)
+                }
+            };
+
+    public TweetsAdapter()
     {
-        this.context = context;
-        this.tweets = tweets;
+        super(DIFF_CALLBACK);
     }
+
+//    // pass in context and list of tweets
+//    public TweetsAdapter(Context context, List<Tweet> tweets)
+//    {
+//        this.context = context;
+//        this.tweets = tweets;
+//    }
 
     // for each row, inflate the layout
     @NonNull
@@ -49,17 +71,24 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position)
     {
         // get data of item at position
-        Tweet tweet = tweets.get(position);
+        Tweet tweet = getItem(position);
+
+        // null placeholders if the PagedList is configured to use them
+        // only works for data sets that have total count provided (i.e. PositionalDataSource)
+        if (tweet == null)
+        {
+            return;
+        }
 
         // bind tweet data to view holder
         holder.bind(tweet);
     }
 
-    @Override
-    public int getItemCount()
-    {
-        return tweets.size();
-    }
+//    @Override
+//    public int getItemCount()
+//    {
+//        return tweets.size();
+//    }
 
     //FOR: swipe down to refresh
     // Clean all elements of the recycler
@@ -73,6 +102,12 @@ public class TweetsAdapter extends RecyclerView.Adapter<TweetsAdapter.ViewHolder
     public void addAll(List<Tweet> list) {
         tweets.addAll(list);
         notifyDataSetChanged();
+    }
+
+    public void addMoreTweets(List<Tweet> newTweets)
+    {
+        tweets.addAll(newTweets);
+        submitList((PagedList<Tweet>) tweets);
     }
 
     // define viewholder (view holder for itemview <=> activity for view)
