@@ -34,7 +34,7 @@ public class TwitterClient extends OAuthBaseClient {
 	public static final String REST_CALLBACK_URL_TEMPLATE = "intent://%s#Intent;action=android.intent.action.VIEW;scheme=%s;package=%s;S.browser_fallback_url=%s;end";
 
 	public static final int DEFAULT_LOAD_SIZE = 25;
-	public static final int NO_PAGE = -1;
+	public static final int NO_MAX_ID = -1;
 
 	public TwitterClient(Context context) {
 		super(context, REST_API_INSTANCE,
@@ -46,12 +46,17 @@ public class TwitterClient extends OAuthBaseClient {
 						context.getString(R.string.intent_scheme), context.getPackageName(), FALLBACK_URL));
 	}
 
+//	public void loadMoreTwitter(long max_id, JsonHttpResponseHandler handler)
+//	{
+//		getHomeTimeline(max_id, handler);
+//	}
+
 	// default overloaded method (for initial load in getHomeTimeline() & refresh in fetchTimelineAsync())
-	public void getHomeTimeline(JsonHttpResponseHandler handler) { getHomeTimeline("1", NO_PAGE, handler); }
+	public void getHomeTimeline(JsonHttpResponseHandler handler) { getHomeTimeline(NO_MAX_ID, handler); }
 
 	// DEFINE METHODS for different API endpoints here
 	// API ref: https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/api-reference/get-statuses-home_timeline
-	public void getHomeTimeline(String max_id, int page, JsonHttpResponseHandler handler)
+	public void getHomeTimeline(long max_id, JsonHttpResponseHandler handler)
 	{
 		// GET ""
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
@@ -59,11 +64,14 @@ public class TwitterClient extends OAuthBaseClient {
 		// Can specify query string params directly or through RequestParams. (HTTPS request headers)
 		RequestParams params = new RequestParams();
 		params.put("count", DEFAULT_LOAD_SIZE);
-		params.put("since_id", max_id);
-		if (page != NO_PAGE)
+		if (max_id != NO_MAX_ID)
 		{
-			params.put("page", page);
+			params.put("max_id", max_id);
 		}
+//		if (page != NO_PAGE)
+//		{
+//			params.put("page", page);
+//		}
 
 		// make https request
 		// get: HTTPS operation

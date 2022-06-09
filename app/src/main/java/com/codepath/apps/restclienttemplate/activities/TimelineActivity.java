@@ -79,6 +79,7 @@ public class TimelineActivity extends AppCompatActivity
             @Override
             public void onRefresh()
             {
+                Log.i(TAG, "refreshing");
                 // refresh list
                 fetchTimelineAsync(0);
             }
@@ -107,11 +108,11 @@ public class TimelineActivity extends AppCompatActivity
     // Append the next page of data into the adapter
     // This method probably sends out a network request and appends new data items to your adapter.
     public void loadNextDataFromApi(int offset) {
-        String max_id = tweets.get(tweets.size()-1).postId;
+        long max_id = tweets.get(tweets.size()-1).postId;
 
         // Send an API request to retrieve appropriate paginated data
         //  --> Send the request including an offset value (i.e `page`) as a query parameter.
-        client.getHomeTimeline(max_id, TwitterClient.NO_PAGE, new JsonHttpResponseHandler() //testing: no pages
+        client.getHomeTimeline(max_id, new JsonHttpResponseHandler()
         {
             @Override
             public void onSuccess(int statusCode, Headers headers, JSON json)
@@ -161,7 +162,7 @@ public class TimelineActivity extends AppCompatActivity
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable)
             {
-                Log.e(TAG, "onFailure " + response, throwable); //error response from server, throwable: print out the exception
+                Log.e(TAG, "onFailure: The status code is " +statusCode+"This is the response" + response, throwable); //error response from server, throwable: print out the exception
             }
         });
     }
