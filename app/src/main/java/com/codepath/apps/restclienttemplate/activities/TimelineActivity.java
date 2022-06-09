@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.codepath.apps.restclienttemplate.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.adapters.TweetsAdapter;
 import com.codepath.apps.restclienttemplate.TwitterApp;
@@ -33,11 +34,17 @@ public class TimelineActivity extends AppCompatActivity
     public static final String TAG = "TimelineActivity"; // for Log
     public final int REQUEST_CODE = 20; // startActivityForResult(): to determine result type later
 
-    TwitterClient client;
     RecyclerView rvTweets;
+
+    TwitterClient client;
     List<Tweet> tweets;
+
+    LinearLayoutManager layoutManager;
     TweetsAdapter adapter;
     SwipeRefreshLayout swipeContainer;
+
+    // ref: endless scroll example project: https://gist.github.com/rogerhu/17aca6ad4dbdb3fa5892
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,7 +63,8 @@ public class TimelineActivity extends AppCompatActivity
         adapter = new TweetsAdapter(this, tweets);
 
         // recycler view setup: layout manager & the adapter
-        rvTweets.setLayoutManager(new LinearLayoutManager(this)); //set layout manager
+        layoutManager = new LinearLayoutManager(this);
+        rvTweets.setLayoutManager(layoutManager); //set layout manager
         rvTweets.setAdapter(adapter); //set adapter for rv
 
         populateHomeTimeline();
@@ -81,6 +89,81 @@ public class TimelineActivity extends AppCompatActivity
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
+
+        //SETUP: infinite scroll
+        // Retain an instance so that you can call `resetState()` for fresh searches
+        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadNextDataFromApi(page);
+            }
+        };
+        // Adds the scroll listener to RecyclerView
+        rvTweets.addOnScrollListener(scrollListener);
+    }
+
+    // Append the next page of data into the adapter
+    // This method probably sends out a network request and appends new data items to your adapter.
+    public void loadNextDataFromApi(int offset) {
+        String max_id = tweets.get(tweets.size()-1).postId;
+
+        // Send an API request to retrieve appropriate paginated data
+        //  --> Send the request including an offset value (i.e `page`) as a query parameter.
+        client.getHomeTimeline(max_id, TwitterClient.NO_PAGE, new JsonHttpResponseHandler() //testing: no pages
+        {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json)
+            {
+                Log.i(TAG, "infinite scroll: fetch tweets onSuccess " + json.toString());
+
+                int preloadSize = adapter.getItemCount();
+
+                //  --> Deserialize and construct new model objects from the API response
+                JSONArray jsonArray = json.jsonArray;   // get array of tweets
+                try {
+                    //  --> Append the new data objects to the existing set of items inside the array of items
+                    tweets.addAll(Tweet.fromJsonArray(jsonArray)); // adapter's 'tweets' points to this.tweets
+                    //  --> Notify the adapter of the new items made with `notifyItemRangeInserted()`
+                    adapter.notifyItemRangeInserted(preloadSize, tweets.size() - 1);
+                } catch (JSONException e) {
+                    Log.e(TAG, "Json exception", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable)
+            {
+                Log.e(TAG, "infinite scroll: fetch tweets onFailure " + response, throwable); //error response from server, throwable: print out the exception
+            }
+        });
+    }
+
+    // initially populate timeline
+    private void populateHomeTimeline()
+    {
+        client.getHomeTimeline(new JsonHttpResponseHandler()
+        {
+            @Override
+            public void onSuccess(int statusCode, Headers headers, JSON json)
+            {
+                Log.i(TAG, "onSuccess " + json.toString());
+                JSONArray jsonArray = json.jsonArray;   // get array of tweets
+                try {
+                    tweets.addAll(Tweet.fromJsonArray(jsonArray)); // adapter's 'tweets' points to this.tweets
+                    adapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    Log.e(TAG, "Json exception", e);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable)
+            {
+                Log.e(TAG, "onFailure " + response, throwable); //error response from server, throwable: print out the exception
+            }
+        });
     }
 
     public void fetchTimelineAsync(int page) {
@@ -112,32 +195,7 @@ public class TimelineActivity extends AppCompatActivity
             @Override
             public void onFailure(int statusCode, Headers headers, String response, Throwable throwable)
             {
-                Log.d("DEBUG", "Fetch timeline error: " + throwable.toString());
-            }
-        });
-    }
-
-    private void populateHomeTimeline()
-    {
-        client.getHomeTimeline(new JsonHttpResponseHandler()
-        {
-            @Override
-            public void onSuccess(int statusCode, Headers headers, JSON json)
-            {
-                Log.i(TAG, "onSuccess " + json.toString());
-                JSONArray jsonArray = json.jsonArray;   // get array of tweets
-                try {
-                    tweets.addAll(Tweet.fromJsonArray(jsonArray)); // adapter's 'tweets' points to this.tweets
-                    adapter.notifyDataSetChanged();
-                } catch (JSONException e) {
-                    Log.e(TAG, "Json exception", e);
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Headers headers, String response, Throwable throwable)
-            {
-                Log.e(TAG, "onFailure " + response, throwable); //error response from server, throwable: print out the exception
+                Log.d(TAG, "Fetch timeline error on refresh: " + throwable.toString());
             }
         });
     }

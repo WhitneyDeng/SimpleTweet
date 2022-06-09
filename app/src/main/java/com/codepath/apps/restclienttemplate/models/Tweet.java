@@ -19,6 +19,7 @@ public class Tweet
     public String createdAt;
     public User user;
     public String mediaUrlHttps;
+    public String postId;
 
     // FOR: Parceler library
     public Tweet() {
@@ -31,6 +32,7 @@ public class Tweet
         tweet.body = jsonObject.getString("text");
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.user = User.fromJson(jsonObject.getJSONObject("user")); //make a User object based on json Object
+        tweet.postId = jsonObject.getString("id_str");
 
         JSONObject entities = jsonObject.getJSONObject("entities");
         if (entities.has("media"))
